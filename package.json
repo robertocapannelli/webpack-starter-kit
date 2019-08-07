@@ -6,5 +6,9 @@
   "repository": "https://github.com/robertocapannelli/webpack-starter-kit.git",
   "author": "Roberto Capannelli <roberto.capannelli@gmail.com>",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6"
+  }
 }
