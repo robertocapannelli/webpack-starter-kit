@@ -2,7 +2,6 @@
   "name": "webpack-starter-kit",
   "version": "1.0.0",
   "description": "Webpack starter kit is a place to start a webpack project",
-  "main": "main.js",
   "repository": "https://github.com/robertocapannelli/webpack-starter-kit.git",
   "author": "Roberto Capannelli <roberto.capannelli@gmail.com>",
   "license": "MIT",
