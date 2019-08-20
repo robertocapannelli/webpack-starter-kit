@@ -3,26 +3,40 @@ const path = require('path');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 var ManifestPlugin = require('webpack-manifest-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-    mode: 'development',
-    entry: './src/main.js',
-    devtool: 'inline-source-map',
-    devServer: { //TODO This is not working properly
-        contentBase:'.', //This tells webpack-dev-server to serve the files from the . directory, where the index is on localhost:8080
-        compress: true,
-        hotOnly: true,
-        port: 8080
+    entry: {
+      main: [
+        './src/main.js',
+        './src/main.scss'
+      ]
     },
     output: {
-        filename: 'scripts/main.js',
+        filename: 'scripts/[name].[contenthash].js',
         path: path.resolve(__dirname, 'dist')
+    },
+    optimization: {
+      moduleIds: 'hashed',
+      runtimeChunk: 'single',
+      splitChunks: {
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all'
+          }
+        }
+      }
     },
     module: {
         rules: [
             {
                 test: /\.css$/,
+                include: path.resolve(__dirname, 'src'),
                 use: [
+                    'cache-loader',
+                    'mini-css-extract-plugin',
                     'style-loader',
                     'css-loader',
                     'postcss-loader'
@@ -30,8 +44,10 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
+                include: path.resolve(__dirname, 'src'),
                 use: [
-                    'style-loader',
+                    'cache-loader',
+                    MiniCssExtractPlugin.loader,
                     'css-loader',
                     'postcss-loader',
                     'sass-loader'
@@ -39,6 +55,7 @@ module.exports = {
             },
             {
                 test: /\.(png|svg|jpg|gif)$/,
+                include: path.resolve(__dirname, 'src'),
                 use: [
                     'file-loader',
                     {
@@ -85,5 +102,8 @@ module.exports = {
         // })
         new CleanWebpackPlugin(),
         new ManifestPlugin(),
+        new MiniCssExtractPlugin({
+          filename: '[name].css'
+        }),
     ]
 };

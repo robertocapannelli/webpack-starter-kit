@@ -1,3 +1,5 @@
 function ciao(){
-    console.log('ciao');
+    alert('ciao');
 }
+
+ciao();
