@@ -8,13 +8,13 @@ const devMode = process.env.NODE_ENV !== 'production';
 module.exports = {
     entry: {
         app: [
-            './src/main.js',
-            './src/main.scss'
+            './assets/scripts/main.js',
+            './assets/styles/main.scss'
         ]
     },
     output: {
         filename: 'scripts/[name].[hash].js',
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, '../../dist'),
     },
     module: {
         rules: [
