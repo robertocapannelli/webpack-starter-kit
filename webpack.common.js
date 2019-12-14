@@ -1,62 +1,47 @@
 const path = require('path');
-
-const StyleLintPlugin = require('stylelint-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-var ManifestPlugin = require('webpack-manifest-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin'); //This genetates automatically the index.html even if we already have one
+const { CleanWebpackPlugin } = require('clean-webpack-plugin'); //This clean up the dist folder if there is something unused
+const ManifestPlugin = require('webpack-manifest-plugin'); //This will generate a manifest file
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const devMode = process.env.NODE_ENV !== 'production';
 
 module.exports = {
     entry: {
-      main: [
-        './src/main.js',
-        './src/main.scss'
-      ]
+        app: [
+            './src/main.js',
+            './src/main.scss'
+        ]
     },
     output: {
-        filename: 'scripts/[name].[contenthash].js',
-        path: path.resolve(__dirname, 'dist')
-    },
-    optimization: {
-      moduleIds: 'hashed',
-      runtimeChunk: 'single',
-      splitChunks: {
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all'
-          }
-        }
-      }
+        filename: 'scripts/[name].[hash].js',
+        path: path.resolve(__dirname, 'dist'),
     },
     module: {
         rules: [
             {
+                //https://webpack.js.org/guides/asset-management/#loading-css
                 test: /\.css$/,
-                include: path.resolve(__dirname, 'src'),
                 use: [
                     'cache-loader',
-                    'mini-css-extract-plugin',
-                    'style-loader',
+                    'style-loader', 
                     'css-loader',
-                    'postcss-loader'
                 ]
             },
             {
-                test: /\.scss$/,
-                include: path.resolve(__dirname, 'src'),
+                test: /\.s[ac]ss$/,
                 use: [
                     'cache-loader',
+                    devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
                     MiniCssExtractPlugin.loader,
                     'css-loader',
-                    'postcss-loader',
-                    'sass-loader'
-                ]
+                    'sass-loader',
+                ],
             },
             {
                 test: /\.(png|svg|jpg|gif)$/,
                 include: path.resolve(__dirname, 'src'),
                 use: [
+                    'cache-loader',
                     'file-loader',
                     {
                         loader: 'image-webpack-loader',
@@ -91,19 +76,26 @@ module.exports = {
                         },
                       },
                 ]
+            },
+            {
+                //https://webpack.js.org/guides/asset-management/#loading-fonts
+                test: /\.(woff|woff2|eot|ttf|otf)$/,
+                use: [
+                    'file-loader'
+                ]
             }
         ]
     },
     plugins: [
-        //TODO This is not working properly
-        // new StyleLintPlugin({
-        //     failOnError: false,
-        //     syntax: 'scss'
-        // })
         new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin(),
         new ManifestPlugin(),
         new MiniCssExtractPlugin({
-          filename: '[name].css'
-        }),
-    ]
+            // Options similar to the same options in webpackOptions.output
+            // both options are optional
+            filename: devMode ? 'styles/[name].[hash].css' : 'styles/[name].css',
+            chunkFilename: devMode ? '[id].css' : '[id].css',
+            ignoreOrder: true,
+          }),
+    ],
 };
